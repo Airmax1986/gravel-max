@@ -1,0 +1,268 @@
+# gravel-max routing profile v1.0.0
+# Original BRouter profile for gravel bicycles.
+# Scenic preferences are per-way costs. Access and direction are separate
+# feasibility rules; per-way costs cannot promise route-wide composition.
+
+---context:global
+
+assign validForBikes = true
+assign add_beeline = false
+assign considerTurnRestrictions = true
+assign turnInstructionRoundabouts = true
+assign turnInstructionMode = 1
+assign processUnusedTags = false
+
+# User settings (BRouter profile parameters; brouter-web reads the %name% comments)
+assign prefer_natural_surfaces = true     # %prefer_natural_surfaces% | Prefer natural surfaces (ground, dirt, grass) | boolean
+assign prefer_gravel_surfaces = true      # %prefer_gravel_surfaces% | Prefer gravel, fine gravel and compacted surfaces | boolean
+assign prefer_singletrails = false        # %prefer_singletrails% | Lower the cost of easy paths and singletrails | boolean
+assign consider_traffic_estimate = true   # %consider_traffic_estimate% | Penalise roads with high estimated traffic | boolean
+assign allow_steps = false                # %allow_steps% | Allow steps (pushing/carrying) at a high cost | boolean
+assign allow_ferries = true               # %allow_ferries% | Allow ferries as connectors | boolean
+assign consider_noise = false             # %consider_noise% | Penalise ways with high estimated noise | boolean
+assign consider_forest = false            # %consider_forest% | Small penalty for ways in open land (opt-in) | boolean
+
+# BRouter's elevation model uses the DEM, not incline tags as a route-wide
+# hill target. Climb costs are set per way (way context, `climb_relief`);
+# only the cutoffs are global.
+assign uphillcutoff = 2
+assign downhillcutoff = 2
+
+# Travel-time model; route choice is primarily distance multiplied by costs.
+assign totalMass = 95
+assign maxSpeed = 40
+assign S_C_x = 0.35
+assign C_r = 0.006
+assign bikerPower = 140
+
+---context:way
+
+# Direction-aware bicycle restrictions. `reversedirection` is supplied by
+# BRouter for evaluation of the reverse edge. Bicycle-specific permissions
+# and cycleway contraflow tags override a generic one-way restriction.
+assign cycleway_contraflow = or cycleway=opposite|opposite_lane|opposite_track
+    or cycleway:left=opposite|opposite_lane|opposite_track
+       cycleway:right=opposite|opposite_lane|opposite_track
+assign generic_reverse_only = oneway=-1
+assign generic_forward_only =
+    if oneway= then junction=roundabout|circular else oneway=yes|true|1
+assign wrong_way =
+    if oneway:bicycle=no then false
+    else if oneway:bicycle=yes then
+        if generic_reverse_only then not reversedirection=yes else reversedirection=yes
+    else if cycleway_contraflow then false
+    else if reversedirection=yes then
+        generic_forward_only
+    else generic_reverse_only
+
+# Access precedence follows OSM specificity: bicycle, vehicle, then access.
+# Explicit bicycle permission can override generic restrictions; relation
+# access (`nodeaccessgranted`) never overrides an explicit prohibition.
+assign bicycle_allowed =
+    if bicycle= then
+        if motorroad=yes then false
+        else if vehicle= then
+            if access= then true
+            else not access=no|private
+        else not vehicle=no|private
+    else bicycle=yes|designated|permissive|destination|dismount
+assign scenic_accessible = bicycle_allowed
+assign access_forbidden = or not scenic_accessible wrong_way
+assign suitable_highway = highway=track|road|path|footway|cycleway|residential|living_street|service|unclassified|tertiary|tertiary_link|secondary|secondary_link|primary|primary_link|bridleway|pedestrian|steps
+
+# The category is explicit: missing surface is unknown, never inferred from
+# highway=track. Track grade is only a separate rideability estimate.
+assign natural_surface = surface=ground|grass|dirt|earth
+assign gravel_surface = surface=gravel|fine_gravel|compacted
+assign loose_surface = surface=sand|pebblestone
+assign hard_surface = surface=asphalt|concrete|paved|paving_stones|sett|metal
+assign surface_factor =
+    if and prefer_natural_surfaces natural_surface then 1.00
+    else if and prefer_gravel_surfaces gravel_surface then 1.10
+    else if surface=mud then 1.85
+    else if surface=clay then 1.48
+    else if surface=wood then 1.30
+    else if loose_surface then 2.25
+    # Rough cobblestone is shaken, not ridden; flat sett stays a paved surface.
+    else if surface=cobblestone then 1.6
+    else if hard_surface then 1.32
+    else if surface=unpaved then 1.12
+    # A road without a surface tag is almost always asphalt; costing it below
+    # asphalt made the router thread missing-data roads. Tracks stay unknown.
+    else if surface= then
+        if highway=residential|unclassified|living_street|service|road|tertiary|tertiary_link|secondary|secondary_link|primary|primary_link|cycleway then 1.32
+        else if and highway=track tracktype=grade1 then 1.30
+        else 1.20
+    else 1.20
+
+assign smoothness_factor =
+    if smoothness=impassable then 10000.0
+    else if smoothness=very_horrible then 5.0
+    else if smoothness=horrible then 3.4
+    else if smoothness=very_bad then 2.5
+    # `bad` on natural or gravel ways is still rideable on a gravel bike; on a
+    # sealed surface it marks real damage.
+    else if smoothness=bad then if or natural_surface gravel_surface then 1.35 else 1.75
+    else if smoothness=rough|poor|off_road_wheels then 1.45
+    else if smoothness=intermediate|medium then 1.15
+    else 1.00
+
+assign track_factor =
+    if highway=track then
+        if tracktype=grade1 then 1.02
+        else if tracktype=grade2 then 1.00
+        else if tracktype=grade3 then 1.10
+        else if tracktype=grade4 then 1.28
+        else if tracktype=grade5 then 1.48
+        else 1.08
+    else 1.00
+
+# Singletrail preference is opt-in; technical MTB trails remain costly.
+# mtb:scale also marks technical tracks, footways and cycleways; the untagged
+# path default applies to paths and bridleways only.
+assign trail_factor =
+    if highway=path|bridleway|track|footway|cycleway then
+        if mtb:scale=3|4|5|6 then 8.0
+        else if mtb:scale=2|2-|2+ then 3.0
+        else if mtb:scale=1|1+|1- then if prefer_singletrails then 1.08 else 1.42
+        else if mtb:scale=0+ then if prefer_singletrails then 1.04 else 1.16
+        else if highway=path|bridleway then if prefer_singletrails then 1.02 else 1.12
+        else 1.00
+    else 1.00
+
+# Major-road costs suppress traffic exposure while retaining calm local paved
+# connectors. Estimated traffic is optional and only uses stock BRouter tags.
+assign road_factor =
+    if highway=motorway|motorway_link|trunk|trunk_link then 12.0
+    else if highway=primary|primary_link then 6.0
+    else if highway=secondary|secondary_link then 3.5
+    else if highway=tertiary|tertiary_link then 2.2
+    else if highway=unclassified|residential|living_street then 1.05
+    else if highway=service then 1.08
+    else if highway=cycleway then 1.0
+    else if highway=footway|pedestrian then 2.4
+    else 1.0
+# Posted speed on rural roads; local and non-road ways are never sped up or
+# slowed by it, and an untagged maxspeed is not guessed.
+assign maxspeed_factor =
+    if highway=track|path|cycleway|footway|bridleway|residential|living_street|pedestrian|service then 1.0
+    else if maxspeed=70 then 1.15
+    else if maxspeed=80 then 1.3
+    else if maxspeed=90|100|110|120|130|rural then 1.5
+    else 1.0
+assign traffic_factor =
+    if not consider_traffic_estimate then 1.0
+    else if estimated_traffic_class=7 then 1.65
+    else if estimated_traffic_class=6 then 1.50
+    else if estimated_traffic_class=5 then 1.36
+    else if estimated_traffic_class=4 then 1.23
+    else if estimated_traffic_class=3 then 1.12
+    else if estimated_traffic_class=2 then 1.06
+    else 1.0
+# Opt-in environment terms; both are 1.0 unless switched on. Forest is a small
+# penalty on open land, never a bonus (costfactor is clamped at 1.0 and a large
+# forest reward would contradict the soft forest rule).
+assign noise_factor =
+    if not consider_noise then 1.0
+    else if estimated_noise_class=6 then 1.4
+    else if estimated_noise_class=5 then 1.25
+    else if estimated_noise_class=4 then 1.15
+    else if estimated_noise_class=3 then 1.08
+    else if estimated_noise_class=2 then 1.03
+    else 1.0
+# No forest class means a green factor below 0.1, i.e. open land (BRouter's
+# environmental pseudo tags), so it costs like class 1-2.
+assign forest_factor =
+    if not consider_forest then 1.0
+    else if or estimated_forest_class= estimated_forest_class=1|2 then 1.08
+    else if estimated_forest_class=3 then 1.04
+    else 1.0
+# Both directions stay routable on reversible roads (direction unknown at
+# routing time), but they are not preferred.
+assign reversible_factor = if oneway=reversible then 1.3 else 1.0
+
+# Avoid technical/unsafe way types and enforce access/direction independently
+# of scenic preferences. Steps are opt-in because most gravel bikes cannot be
+# ridden over them; ferries remain available as connectors.
+assign surface_smoothness_factor = multiply surface_factor smoothness_factor
+assign surface_track_factor = multiply surface_smoothness_factor track_factor
+assign trail_road_factor = multiply trail_factor road_factor
+assign environment_factor = multiply noise_factor forest_factor
+assign traffic_environment_factor = multiply traffic_factor environment_factor
+assign traffic_dismount_factor = multiply maxspeed_factor multiply traffic_environment_factor ( switch bicycle=dismount 8.0 1.0 )
+assign trail_traffic_factor = multiply trail_road_factor traffic_dismount_factor
+assign wayfactor = multiply reversible_factor multiply surface_track_factor trail_traffic_factor
+# Climb is charged where it is ridden: natural, gravel and unpaved ways pay
+# less per metre of ascent (20/8) than paved and unknown-surface ways (55/18),
+# so ridge tracks are no longer traded for valley asphalt while steep asphalt
+# shortcuts stay penalised. Unknown is not gravel. The relief follows the
+# surface preferences: switching one off removes it for that class, and
+# generic `unpaved` (gravel or dirt) keeps it only while both are on. Both
+# costs live only here: BRouter treats a global assign as read-only in the
+# way context.
+assign climb_relief =
+    or and prefer_natural_surfaces natural_surface
+    or and prefer_gravel_surfaces gravel_surface
+       and prefer_natural_surfaces and prefer_gravel_surfaces surface=unpaved
+assign uphillcost = if climb_relief then 20 else 55
+assign downhillcost = if climb_relief then 8 else 18
+assign costfactor =
+    if highway=motorway|motorway_link then 10000
+    else if highway=proposed|construction|abandoned then 10000
+    else if sac_scale=mountain_hiking|demanding_mountain_hiking|alpine_hiking|demanding_alpine_hiking|difficult_alpine_hiking|yes then 10000
+    else if smoothness=impassable then 10000
+    else if access_forbidden then 10000
+    else if highway=steps then if allow_steps then multiply 9.0 wayfactor else 10000
+    else if route=ferry then if allow_ferries then 1.8 else 10000
+    else if not suitable_highway then 10000
+    else max 1.0 min 9999 wayfactor
+
+# BRouter turn instructions and route restriction handling.
+assign turncost = if junction=roundabout|circular then 12 else 45
+assign initialclassifier =
+    if route=ferry then 4
+    else if highway=primary|primary_link|secondary|secondary_link then 3
+    else if highway=steps then 2
+    else 1
+assign initialcost = if route=ferry then 5000 else 0
+assign priorityclassifier =
+    if highway=motorway then 30
+    else if highway=trunk then 28
+    else if highway=primary then 26
+    else if highway=secondary then 24
+    else if highway=tertiary then 22
+    else if highway=unclassified then 20
+    else if highway=residential|living_street|service|cycleway then 6
+    else if highway=track then 5
+    else if highway=path|footway|bridleway|steps then 3
+    else 0
+assign isbadoneway = wrong_way
+assign isgoodoneway = if reversedirection=yes then oneway=-1 else oneway=yes|true|1
+assign isroundabout = junction=roundabout|circular
+assign islinktype = highway=motorway_link|trunk_link|primary_link|secondary_link|tertiary_link
+assign isgoodforcars = greater priorityclassifier 6
+assign classifiermask = add isbadoneway add multiply isgoodoneway 2 add multiply isroundabout 4 add multiply islinktype 8 multiply isgoodforcars 16
+
+---context:node
+
+# Explicit node restrictions are evaluated before BRouter's cycle-route
+# access shortcut, preventing a relation from reopening a banned barrier.
+assign explicit_node_access_ban = access=no|private
+assign node_bicycle_allowed =
+    if bicycle= then
+        if vehicle= then if access= then true else not explicit_node_access_ban
+        else not vehicle=no|private
+    else bicycle=yes|designated|permissive|destination|dismount
+assign barrier_factor =
+    if barrier=wall|fence|full-height_turnstile|turnstile|stile|horse_stile|spikes|jersey_barrier then 1000000
+    else if barrier=bollard|cycle_barrier|kissing_gate|hampshire_gate|bus_trap then 120
+    else if barrier=gate|lift_gate|swing_gate|chain|block|obstacle then 35
+    # Obstacles a gravel rider lifts the bike over: costly, never a hard block.
+    else if barrier=log|fallen_tree|debris|windfall|tree|ditch|hedge|guard_rail|rope|bar then 500
+    else if barrier=yes|motorcycle_barrier|barrier|chicane then 60
+    else if barrier=kerb|cattle_grid then 10
+    else if highway=steps then if allow_steps then 30 else 1000000
+    else 0
+assign initialcost =
+    if not node_bicycle_allowed then 1000000
+    else barrier_factor

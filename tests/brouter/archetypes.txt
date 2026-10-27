@@ -1,0 +1,126 @@
+# Cost-table archetypes: "label | token ...". Tokens: NODE (node context), REV (inverse
+# direction), opt:name=value (profile option override), otherwise an OSM key=value.
+# Labels are stable IDs referenced by the remediation plan; do not rename them.
+# tracks
+trk_g1 | highway=track tracktype=grade1
+trk_g2 | highway=track tracktype=grade2
+trk_g3 | highway=track tracktype=grade3
+trk_g4 | highway=track tracktype=grade4
+trk_g5 | highway=track tracktype=grade5
+trk_untagged | highway=track
+trk_g1_gravel | highway=track tracktype=grade1 surface=gravel
+trk_g2_gravel | highway=track tracktype=grade2 surface=gravel
+trk_g3_gravel | highway=track tracktype=grade3 surface=gravel
+trk_g4_gravel | highway=track tracktype=grade4 surface=gravel
+trk_g5_gravel | highway=track tracktype=grade5 surface=gravel
+trk_g1_ground | highway=track tracktype=grade1 surface=ground
+trk_g2_ground | highway=track tracktype=grade2 surface=ground
+trk_g3_ground | highway=track tracktype=grade3 surface=ground
+trk_g4_ground | highway=track tracktype=grade4 surface=ground
+trk_g5_ground | highway=track tracktype=grade5 surface=ground
+trk_g2_compacted | highway=track tracktype=grade2 surface=compacted
+trk_g2_fine_gravel | highway=track tracktype=grade2 surface=fine_gravel
+trk_g2_unpaved | highway=track tracktype=grade2 surface=unpaved
+trk_g2_asphalt | highway=track tracktype=grade2 surface=asphalt
+trk_g1_asphalt | highway=track tracktype=grade1 surface=asphalt
+trk_g2_paved | highway=track tracktype=grade2 surface=paved
+trk_g2_concrete | highway=track tracktype=grade2 surface=concrete
+trk_g2_cobblestone | highway=track tracktype=grade2 surface=cobblestone
+trk_g2_sand | highway=track tracktype=grade2 surface=sand
+trk_g2_mud | highway=track tracktype=grade2 surface=mud
+trk_g2_grass | highway=track tracktype=grade2 surface=grass
+trk_g2_gravel_sm_bad | highway=track tracktype=grade2 surface=gravel smoothness=bad
+trk_g2_gravel_sm_very_bad | highway=track tracktype=grade2 surface=gravel smoothness=very_bad
+trk_g2_gravel_sm_intermediate | highway=track tracktype=grade2 surface=gravel smoothness=intermediate
+trk_g2_ground_sm_bad | highway=track tracktype=grade2 surface=ground smoothness=bad
+trk_g2_asphalt_sm_bad | highway=track tracktype=grade2 surface=asphalt smoothness=bad
+trk_g4_gravel_sm_bad | highway=track tracktype=grade4 surface=gravel smoothness=bad
+trk_g5_sand | highway=track tracktype=grade5 surface=sand
+trk_g2_mtb2 | highway=track tracktype=grade2 surface=ground mtb:scale=2
+# paths
+path_ground | highway=path surface=ground
+path_ground_mtb0 | highway=path surface=ground mtb:scale=0
+path_ground_mtb1 | highway=path surface=ground mtb:scale=1
+path_ground_mtb2 | highway=path surface=ground mtb:scale=2
+path_ground_mtb3 | highway=path surface=ground mtb:scale=3
+path_grass | highway=path surface=grass
+path_hiking | highway=path surface=ground sac_scale=hiking
+path_mountain_hiking | highway=path surface=ground sac_scale=mountain_hiking
+bridleway_ground | highway=bridleway surface=ground
+path_mtb1_single | highway=path surface=ground mtb:scale=1 opt:prefer_singletrails=1
+# cycleways / footways
+cycleway_asphalt | highway=cycleway surface=asphalt
+cycleway_untagged | highway=cycleway
+cycleway_compacted | highway=cycleway surface=compacted
+footway_asphalt | highway=footway surface=asphalt
+# roads
+res_asphalt | highway=residential surface=asphalt
+res_untagged | highway=residential
+living_untagged | highway=living_street
+service_untagged | highway=service
+service_asphalt | highway=service surface=asphalt
+uncl_asphalt | highway=unclassified surface=asphalt
+uncl_untagged | highway=unclassified
+road_untagged | highway=road
+tert_asphalt | highway=tertiary surface=asphalt
+tert_untagged | highway=tertiary
+tert_asphalt_ms70 | highway=tertiary surface=asphalt maxspeed=70
+tert_asphalt_ms100 | highway=tertiary surface=asphalt maxspeed=100
+sec_asphalt | highway=secondary surface=asphalt
+sec_untagged | highway=secondary
+sec_asphalt_ms80 | highway=secondary surface=asphalt maxspeed=80
+sec_asphalt_ms100 | highway=secondary surface=asphalt maxspeed=100
+sec_asphalt_rural | highway=secondary surface=asphalt maxspeed=rural
+prim_asphalt | highway=primary surface=asphalt
+prim_asphalt_ms80 | highway=primary surface=asphalt maxspeed=80
+prim_asphalt_ms100 | highway=primary surface=asphalt maxspeed=100
+trunk_asphalt | highway=trunk surface=asphalt
+res_asphalt_traffic5 | highway=residential surface=asphalt estimated_traffic_class=5
+prim_asphalt_traffic7 | highway=primary surface=asphalt estimated_traffic_class=7
+res_asphalt_ms70 | highway=residential surface=asphalt maxspeed=70
+# direction / access
+res_oneway_rev | REV highway=residential surface=asphalt oneway=yes
+res_reversible | highway=residential surface=asphalt oneway=reversible
+res_reversible_rev | REV highway=residential surface=asphalt oneway=reversible
+trk_access_no | highway=track access=no
+trk_access_no_bike_yes | highway=track access=no bicycle=yes
+trk_dismount | highway=track surface=gravel bicycle=dismount
+# options
+trk_g2_ground_no_natural | highway=track tracktype=grade2 surface=ground opt:prefer_natural_surfaces=0
+res_asphalt_noise5 | highway=residential surface=asphalt estimated_noise_class=5
+res_asphalt_noise5_on | highway=residential surface=asphalt estimated_noise_class=5 opt:consider_noise=1
+trk_g2_gravel_forest1 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=1
+trk_g2_gravel_forest1_on | highway=track tracktype=grade2 surface=gravel estimated_forest_class=1 opt:consider_forest=1
+trk_g2_gravel_forest6_on | highway=track tracktype=grade2 surface=gravel estimated_forest_class=6 opt:consider_forest=1
+trk_g2_gravel_forest2 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=2
+trk_g2_gravel_forest3 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=3
+trk_g2_gravel_forest4 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=4
+trk_g2_gravel_forest5 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=5
+trk_g2_gravel_forest6 | highway=track tracktype=grade2 surface=gravel estimated_forest_class=6
+trk_g2_gravel_forestnone_on | highway=track tracktype=grade2 surface=gravel opt:consider_forest=1
+res_asphalt_noise1 | highway=residential surface=asphalt estimated_noise_class=1
+res_asphalt_noise2 | highway=residential surface=asphalt estimated_noise_class=2
+res_asphalt_noise3 | highway=residential surface=asphalt estimated_noise_class=3
+res_asphalt_noise4 | highway=residential surface=asphalt estimated_noise_class=4
+res_asphalt_noise6 | highway=residential surface=asphalt estimated_noise_class=6
+res_asphalt_noise6_on | highway=residential surface=asphalt estimated_noise_class=6 opt:consider_noise=1
+# field combinations seen on evaluation routes (docs/REMEDIATION_PLAN.md R14)
+trk_g3_fine_gravel_sm_bad | highway=track tracktype=grade3 surface=fine_gravel smoothness=bad
+trk_g3_gravel_sm_bad | highway=track tracktype=grade3 surface=gravel smoothness=bad
+trk_g2_gravel_sm_good | highway=track tracktype=grade2 surface=gravel smoothness=good
+trk_g4_grass | highway=track tracktype=grade4 surface=grass
+trk_g3_dirt | highway=track tracktype=grade3 surface=dirt
+path_asphalt | highway=path surface=asphalt
+path_untagged | highway=path
+# nodes
+node_gate | NODE barrier=gate
+node_bollard | NODE barrier=bollard
+node_cycle_barrier | NODE barrier=cycle_barrier
+node_wall | NODE barrier=wall
+node_kerb | NODE barrier=kerb
+node_cattle_grid | NODE barrier=cattle_grid
+node_log | NODE barrier=log
+node_yes | NODE barrier=yes
+node_access_no | NODE access=no
+node_access_no_bike_yes | NODE access=no bicycle=yes
+node_steps | NODE highway=steps

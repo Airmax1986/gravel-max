@@ -1,0 +1,44 @@
+{
+  "brouter_revision": "041488b36c761ff2dd0fd71c1538b646364223ea",
+  "profile_sha256": "123d3d0e3c943edc892b23405a0ab704355fafc4abead69d0325e1b23141ba68",
+  "java": "openjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode)",
+  "dependency_sha256": {
+    "osmosis-osm-binary-0.48.3.jar": "06538f38520151c3b4d32d05311038509c10be5b43c2534c4d127dfe698bf2eb",
+    "protobuf-java-3.12.2.jar": "b385bef93bad20c5e7a6cf3b1c73edde29bdec4bb3bb75688d233b561f0dcaa0"
+  },
+  "checks": [
+    {
+      "name": "stock-contracts",
+      "status": "passed",
+      "summary": "ProfileContractTest: 193 assertions passed"
+    },
+    {
+      "name": "contracts-lookups-v11",
+      "status": "passed",
+      "summary": "ProfileContractTest: 193 assertions passed"
+    },
+    {
+      "name": "routing-fixture",
+      "status": "passed",
+      "summary": "RouteFixtureTest: 13 real RD5 routes, 130 assertions passed"
+    },
+    {
+      "name": "cost-table",
+      "status": "passed",
+      "summary": "CostTable: 115 archetypes, identical on both lookups; 1035 rows over 9 option sets match expected-costs.tsv"
+    }
+  ],
+  "field_validated": false,
+  "test_source_sha256": {
+    "scripts/test_brouter_profile.py": "301b81eb36fd4980dd4be3e75f0b37712196d9555c316bb9a99eee4f2191b54b",
+    "tests/brouter/CostTable.java": "4b10b94c8d9643bc7f26ad4ff691eeced97a979997cb5ae85e9f259f32efd53f",
+    "tests/brouter/ProfileContractTest.java": "b6c12b97394385b775b9c5bd2d0d69f0c5c8b609175b7269fb0e511679c0ba20",
+    "tests/brouter/RouteFixtureTest.java": "bc8b6d8eb70df62b624633bfb6bb1ebbf59fd6e17dfe3f1ab83bd89a535724a8",
+    "tests/brouter/archetypes.txt": "2a88da19b0a5c73f7ae71e94288e00a82aa5db7146df491d1a6599b6bb401bc2",
+    "tests/brouter/expected-costs.tsv": "e63ebb101693764fe1d4a9ff6019a5896ff369ce69b198f2c52d9b2494538f2d"
+  },
+  "lookups_sha256": {
+    "stock": "04d4e63aff9864c2472acf4fad7850f5b44d64289852f8fc429445950fbf37fc",
+    "v1.7.10": "bf8fc3b2c052b7204e9c5a8d78e4d6ab6b125d3236a943f34583b838c477f419"
+  }
+}
