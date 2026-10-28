@@ -1,4 +1,4 @@
-# gravel-max routing profile v1.0.0
+# gravel-max routing profile v1.0.1
 # Original BRouter profile for gravel bicycles.
 # Scenic preferences are per-way costs. Access and direction are separate
 # feasibility rules; per-way costs cannot promise route-wide composition.
