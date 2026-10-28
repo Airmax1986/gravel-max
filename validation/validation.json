@@ -1,6 +1,6 @@
 {
   "brouter_revision": "041488b36c761ff2dd0fd71c1538b646364223ea",
-  "profile_sha256": "123d3d0e3c943edc892b23405a0ab704355fafc4abead69d0325e1b23141ba68",
+  "profile_sha256": "5f57d816fc09d2bc221642abaa96ac1b17a0ffd471640886b197ab7451c5fbb9",
   "java": "openjdk version \"17.0.20.1\" 2026-08-18\nOpenJDK Runtime Environment Temurin-17.0.20.1+1 (build 17.0.20.1+1)\nOpenJDK 64-Bit Server VM Temurin-17.0.20.1+1 (build 17.0.20.1+1, mixed mode)",
   "dependency_sha256": {
     "osmosis-osm-binary-0.48.3.jar": "06538f38520151c3b4d32d05311038509c10be5b43c2534c4d127dfe698bf2eb",

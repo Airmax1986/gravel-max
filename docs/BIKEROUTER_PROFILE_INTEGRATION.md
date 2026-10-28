@@ -1,10 +1,42 @@
-# Using gravel-max with Bikerouter / Wegwiesel
+# Using gravel-max with bikerouter.de and the Bikerouter app
+
+Two different projects share the name. [bikerouter.de](https://bikerouter.de)
+is a BRouter-Web site where anyone can load a custom profile in the browser.
+The Bikerouter / Wegwiesel app (`boonkerz/bikerouter`) is a separate Flutter
+application whose profiles are installed by its server operator; the sections
+after this one cover that app.
+
+## bikerouter.de (and other BRouter-Web sites)
+
+gravel-max is not in bikerouter.de's profile list. Use it as a custom profile:
+
+1. Open [bikerouter.de](https://bikerouter.de) and the profile editor in the
+   sidebar.
+2. Replace the editor text with the full contents of `profiles/gravel-max.brf`
+   and press **Upload**. The site sends the profile to its routing engine,
+   which answers with a temporary `custom_…` profile id, and routes with it
+   from then on.
+3. Plan the route as usual. The browser keeps the profile text; the engine may
+   drop uploaded profiles after a while, so upload again if routing reports a
+   missing profile.
+
+Checked on 2026-10-28: bikerouter.de's engine (`BRouter-1.7.9`) accepted the
+upload and returned a route between Bad Iburg and Hilter. The profile declares
+its options (see the table below) in BRouter-Web's `%name% | label | boolean`
+format, so the editor should offer them as switches; that part was not checked
+in the browser. Adding gravel-max to the site's built-in profile list is up to
+the bikerouter.de operator.
+
+The same steps work on other BRouter-Web instances that allow custom profiles,
+such as brouter.de.
+
+## Bikerouter / Wegwiesel app
 
 Integration examined against `boonkerz/bikerouter` commit
 `527f4c28a9607e2e95819fbfddd4c61302e6edaf`:
 https://github.com/boonkerz/bikerouter/tree/527f4c28a9607e2e95819fbfddd4c61302e6edaf
 
-## Server installation
+### Server installation
 
 The upstream `Dockerfile.brouter` builds BRouter v1.7.8. On startup it copies
 `/brouter/customprofiles/*.brf` to `/brouter/profiles2/`. Install this project's
@@ -28,7 +60,7 @@ Use points covered by that server's segments. A missing-profile response means
 the server installation is incomplete. Do not silently substitute another
 profile and label its result gravel-max.
 
-## App registration
+### App registration
 
 For an operator-maintained build of the linked Flutter app, add an entry to
 `app/lib/models/profile.dart` in the `profiles` registry:
@@ -67,7 +99,7 @@ sent as `profile:<name>=1|0`):
 | `consider_noise` | `false` |
 | `consider_forest` | `false` |
 
-## Offline and iPhone boundary
+### Offline and iPhone boundary
 
 The upstream offline-routing documentation describes a hardcoded trekking cost
 model, not a general BRF interpreter. A custom server BRF does not install a

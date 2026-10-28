@@ -1,4 +1,4 @@
-# gravel-max BRouter profile v1.0.0
+# gravel-max BRouter profile v1.0.1
 
 `profiles/gravel-max.brf` is an original BRouter 1.7.8-compatible routing
 profile for gravel bicycles. It combines per-way riding preference with
@@ -10,7 +10,10 @@ server that serves `profiles2`; clients select it by the profile basename,
 
 Copy `profiles/gravel-max.brf` into the server's `profiles2/` directory and
 restart/reload that BRouter instance as its deployment requires. A typical
-HTTP routing request sets `profile=gravel-max`. For Bikerouter, installation
+HTTP routing request sets `profile=gravel-max`. On bikerouter.de and other
+BRouter-Web sites, upload the file through the profile editor instead (see
+[the integration guide](BIKEROUTER_PROFILE_INTEGRATION.md)). For the
+Bikerouter / Wegwiesel app, installation
 on a server makes the profile usable by online requests but does not add it to
 the app's profile picker or deploy it to the existing public service. The app
 registry and server deployment are separate integration steps. The app's

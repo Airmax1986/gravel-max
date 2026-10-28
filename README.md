@@ -28,11 +28,12 @@ a mobile app.
    brouter.de (3–14 % on the evaluation set); add
    `profile:correctMisplacedViaPoints=0` to keep them.
 3. Alternatively, load the BRF into a BRouter client that supports custom
-   profile text, following that client's profile-import instructions.
+   profile text. On [bikerouter.de](https://bikerouter.de) and other
+   BRouter-Web sites, paste it into the profile editor and press Upload.
 
 See [the profile guide](docs/GRAVEL_MAX_PROFILE.md) for options and behavior,
-and [Bikerouter integration](docs/BIKEROUTER_PROFILE_INTEGRATION.md) for the
-existing Flutter iPhone application.
+and [bikerouter.de and Bikerouter app integration](docs/BIKEROUTER_PROFILE_INTEGRATION.md)
+for the browser upload steps and the separate Flutter iPhone application.
 Release changes and validation scope are listed in
 [PROFILE_CHANGELOG.md](PROFILE_CHANGELOG.md).
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.1
+
+Documentation only; routing behaviour is unchanged from 1.0.0 (the profile
+differs only in its version comment).
+
+- Add bikerouter.de usage: upload the profile through the BRouter-Web profile
+  editor. Checked on 2026-10-28 against bikerouter.de's engine (BRouter 1.7.9):
+  upload accepted and a test route computed.
+- Separate bikerouter.de from the Bikerouter / Wegwiesel app, which the
+  integration guide previously covered alone.
+
 ## 1.0.0 — first release
 
 Original gravel-max BRouter routing profile, released under MIT.
